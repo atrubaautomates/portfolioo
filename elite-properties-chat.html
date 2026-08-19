@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elite Estates — AI Assistant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --primary:#2563EB;
+    --secondary:#1D4ED8;
+    --highlight:#38BDF8;
+    --dark:#0B1F33;
+    --user-bubble:#EDF4FF;
+    --ai-bubble:#F5F8FC;
+    --primary-rgb:37,99,235;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    background:#EEF2F6;
+    font-family:'Inter',sans-serif;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+  }
+  .chat-card{
+    width:100%;
+    max-width:440px;
+    height:min(700px, 100vh - 36px);
+    background:#fff;
+    border-radius:22px;
+    box-shadow:0 20px 60px rgba(11,31,51,0.14);
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+  @media (max-width:480px){
+    body{padding:0;}
+    .chat-card{max-width:100%;height:100vh;border-radius:0;}
+  }
+
+  /* Header */
+  .chat-header{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:18px 20px;
+    border-bottom:1px solid rgba(11,31,51,0.07);
+    flex-shrink:0;
+  }
+  .chat-avatar{
+    width:44px;height:44px;
+    border-radius:14px;
+    background:linear-gradient(135deg, var(--primary), var(--secondary));
+    display:flex;align-items:center;justify-content:center;
+    font-size:21px;
+    flex-shrink:0;
+    box-shadow:0 6px 16px rgba(var(--primary-rgb),0.35);
+  }
+  .chat-header-info{flex:1;min-width:0;}
+  .chat-header-info h1{
+    font-size:0.96rem;
+    font-weight:700;
+    color:var(--dark);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .chat-status{
+    display:flex;align-items:center;gap:6px;
+    font-size:0.76rem;
+    color:#6B7A8C;
+    margin-top:3px;
+  }
+  .status-dot{
+    width:7px;height:7px;border-radius:50%;
+    background:var(--primary);
+    box-shadow:0 0 0 3px rgba(var(--primary-rgb),0.18);
+    animation:pulse 2s infinite;
+  }
+  @keyframes pulse{
+    0%,100%{opacity:1;}
+    50%{opacity:0.45;}
+  }
+
+  /* Body */
+  .chat-body{
+    flex:1;
+    overflow-y:auto;
+    padding:18px 16px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    background:#fff;
+  }
+  .chat-body::-webkit-scrollbar{width:5px;}
+  .chat-body::-webkit-scrollbar-thumb{background:rgba(11,31,51,0.12);border-radius:10px;}
+
+  .msg{
+    max-width:82%;
+    padding:10px 14px;
+    border-radius:16px;
+    font-size:0.87rem;
+    line-height:1.48;
+    color:var(--dark);
+    animation:fadeIn 0.3s ease;
+  }
+  @keyframes fadeIn{
+    from{opacity:0; transform:translateY(6px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+  .msg.bot{
+    align-self:flex-start;
+    background:var(--ai-bubble);
+    border-bottom-left-radius:4px;
+  }
+  .msg.user{
+    align-self:flex-end;
+    background:var(--user-bubble);
+    border-bottom-right-radius:4px;
+  }
+  .typing{
+    align-self:flex-start;
+    background:var(--ai-bubble);
+    padding:12px 16px;
+    border-radius:16px;
+    border-bottom-left-radius:4px;
+    display:flex;
+    gap:4px;
+  }
+  .typing span{
+    width:6px;height:6px;border-radius:50%;
+    background:var(--secondary);
+    opacity:0.5;
+    animation:blink 1.2s infinite;
+  }
+  .typing span:nth-child(2){animation-delay:0.2s;}
+  .typing span:nth-child(3){animation-delay:0.4s;}
+  @keyframes blink{
+    0%,100%{opacity:0.3; transform:translateY(0);}
+    50%{opacity:1; transform:translateY(-3px);}
+  }
+
+  /* Quick actions */
+  .quick-actions{
+    display:flex;
+    gap:8px;
+    padding:2px 16px 14px;
+    flex-wrap:wrap;
+    flex-shrink:0;
+  }
+  .quick-btn{
+    background:var(--ai-bubble);
+    border:1px solid rgba(11,31,51,0.08);
+    color:var(--dark);
+    padding:8px 13px;
+    border-radius:20px;
+    font-size:0.78rem;
+    font-weight:500;
+    cursor:pointer;
+    transition:0.2s;
+    white-space:nowrap;
+  }
+  .quick-btn:hover{
+    background:var(--primary);
+    color:#fff;
+    border-color:var(--primary);
+  }
+
+  /* Input row */
+  .chat-input-row{
+    display:flex;
+    gap:10px;
+    padding:14px 16px;
+    border-top:1px solid rgba(11,31,51,0.07);
+    flex-shrink:0;
+    background:#fff;
+  }
+  .chat-input-row input{
+    flex:1;
+    border:1px solid rgba(11,31,51,0.14);
+    border-radius:24px;
+    padding:11px 16px;
+    font-size:0.87rem;
+    outline:none;
+    color:var(--dark);
+    font-family:inherit;
+  }
+  .chat-input-row input:focus{border-color:var(--primary);}
+  .send-btn{
+    width:42px;height:42px;
+    border-radius:50%;
+    background:var(--primary);
+    border:none;
+    color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    flex-shrink:0;
+    transition:0.2s;
+  }
+  .send-btn:hover{background:var(--secondary);}
+  .send-btn svg{width:18px;height:18px;}
+</style>
+</head>
+<body>
+
+  <div class="chat-card">
+    <div class="chat-header">
+      <div class="chat-avatar">🏠</div>
+      <div class="chat-header-info">
+        <h1>Elite Estates — AI Property Assistant</h1>
+        <div class="chat-status"><span class="status-dot"></span>Online now</div>
+      </div>
+    </div>
+
+    <div class="chat-body" id="chat-body">
+      <div class="msg bot">Welcome to Elite Estates 🏠 I can help you find your dream property, book a viewing, or connect you with an agent. What are you looking for?</div>
+    </div>
+
+    <div class="quick-actions" id="quick-actions">
+      <button class="quick-btn" data-key="find">🏠 Find Property</button>
+      <button class="quick-btn" data-key="viewing">📅 Book Viewing</button>
+      <button class="quick-btn" data-key="agent">💬 Talk to Agent</button>
+    </div>
+
+    <div class="chat-input-row">
+      <input type="text" id="chat-input" placeholder="Ask about listings, viewings, or pricing..." autocomplete="off">
+      <button class="send-btn" id="send-btn" aria-label="Send">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 12L21 3L15 21L11 13L3 12Z" stroke="white" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </div>
+
+<script>
+  const N8N_WEBHOOK_URL = "https://blablablabla999.app.n8n.cloud/webhook/d99ce469-8e8a-423e-8048-acafb1cccbc3/chat";
+
+  const chatBody = document.getElementById('chat-body');
+  const input = document.getElementById('chat-input');
+  const sendBtn = document.getElementById('send-btn');
+
+  function getSessionId(){
+    let sid = sessionStorage.getItem('elite_chat_session');
+    if(!sid){
+      sid = (crypto.randomUUID ? crypto.randomUUID() : 'sess-' + Date.now() + '-' + Math.random().toString(36).slice(2));
+      sessionStorage.setItem('elite_chat_session', sid);
+    }
+    return sid;
+  }
+
+  function scrollToBottom(){
+    chatBody.scrollTop = chatBody.scrollHeight;
+  }
+
+  function addMessage(text, from){
+    const div = document.createElement('div');
+    div.className = 'msg ' + from;
+    div.textContent = text;
+    chatBody.appendChild(div);
+    scrollToBottom();
+  }
+
+  function showTyping(){
+    const t = document.createElement('div');
+    t.className = 'typing';
+    t.id = 'typing-indicator';
+    t.innerHTML = '<span></span><span></span><span></span>';
+    chatBody.appendChild(t);
+    scrollToBottom();
+  }
+
+  function hideTyping(){
+    const t = document.getElementById('typing-indicator');
+    if (t) t.remove();
+  }
+
+  function setInputDisabled(disabled){
+    input.disabled = disabled;
+    sendBtn.disabled = disabled;
+    document.querySelectorAll('.quick-btn').forEach(b => b.disabled = disabled);
+  }
+
+  async function sendToN8n(message){
+    const sessionId = getSessionId();
+    try{
+      const res = await fetch(N8N_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'sendMessage',
+          chatInput: message,
+          sessionId: sessionId
+        })
+      });
+      if(!res.ok) throw new Error('Request failed: ' + res.status);
+      let data = await res.json();
+      if (Array.isArray(data)) data = data[0] || {};
+      if (typeof data === 'string') return data;
+      return data.output || data.text || data.message || data.reply || "Sorry, I didn't quite get a response — could you try again?";
+    } catch(err){
+      console.error('n8n request failed:', err);
+      return "Sorry, I'm having trouble connecting right now. Please try again in a moment.";
+    }
+  }
+
+  async function sendUserMessage(text){
+    addMessage(text, 'user');
+    setInputDisabled(true);
+    showTyping();
+    const reply = await sendToN8n(text);
+    hideTyping();
+    addMessage(reply, 'bot');
+    setInputDisabled(false);
+    input.focus();
+  }
+
+  document.querySelectorAll('.quick-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      sendUserMessage(btn.textContent);
+    });
+  });
+
+  function handleSend(){
+    const val = input.value.trim();
+    if (!val) return;
+    input.value = '';
+    sendUserMessage(val);
+  }
+
+  sendBtn.addEventListener('click', handleSend);
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') handleSend();
+  });
+</script>
+</body>
+</html>
