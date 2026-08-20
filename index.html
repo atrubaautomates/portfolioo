@@ -591,14 +591,16 @@
     z-index:999;
     align-items:center;
     justify-content:center;
-    padding:20px;
+    padding:16px;
+    box-sizing:border-box;
   }
   .demo-modal.active{display:flex;}
   .demo-modal-inner{
     background:var(--bg);
     width:100%;
-    max-width:420px;
-    height:85vh;
+    max-width:min(420px, calc(100vw - 32px));
+    height:min(700px, calc(100vh - 32px));
+    height:min(700px, calc(100dvh - 32px));
     border-radius:20px;
     overflow:hidden;
     position:relative;
