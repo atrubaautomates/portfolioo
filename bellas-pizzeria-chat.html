@@ -140,6 +140,13 @@
     margin-top:8px;
   }
   .msg .msg-line{display:block;}
+  .msg .msg-list{
+    margin:6px 0;
+    padding-left:20px;
+  }
+  .msg .msg-list li{
+    margin-bottom:3px;
+  }
   .typing{
     align-self:flex-start;
     background:var(--ai-bubble);
@@ -311,8 +318,27 @@
     // Italic: *text* (single asterisks not part of a bold pair)
     out = out.replace(/(^|[^*])\*([^\n*]+?)\*(?!\*)/g, '$1<em>$2</em>');
 
-    // Line breaks
-    out = out.replace(/\n/g, '<br>');
+    // Bullet lists: turn lines starting with "* " or "- " into a proper <ul><li> list
+    const lines = out.split('\n');
+    const blocks = [];
+    let listBuffer = [];
+    function flushList(){
+      if (listBuffer.length){
+        blocks.push('<ul class="msg-list">' + listBuffer.map(function(item){ return '<li>' + item + '</li>'; }).join('') + '</ul>');
+        listBuffer = [];
+      }
+    }
+    lines.forEach(function(line){
+      const bulletMatch = line.match(/^\s*[*-]\s+(.*)$/);
+      if (bulletMatch){
+        listBuffer.push(bulletMatch[1]);
+      } else {
+        flushList();
+        blocks.push(line);
+      }
+    });
+    flushList();
+    out = blocks.join('<br>').replace(/<br>(<ul class="msg-list">)/g, '$1').replace(/(<\/ul>)<br>/g, '$1');
 
     return out;
   }
