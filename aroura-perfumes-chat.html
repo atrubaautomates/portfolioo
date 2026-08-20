@@ -8,13 +8,13 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --primary:#8B7CF6;
-    --secondary:#6366F1;
-    --highlight:#A5B4FC;
+    --primary:#EC4899;
+    --secondary:#DB2777;
+    --highlight:#F9A8D4;
     --dark:#0B1F33;
-    --user-bubble:#F1F0FF;
-    --ai-bubble:#F7F6FC;
-    --primary-rgb:139,124,246;
+    --user-bubble:#FDEEF6;
+    --ai-bubble:#FDF6FA;
+    --primary-rgb:236,72,153;
   }
   *{margin:0;padding:0;box-sizing:border-box;}
   html,body{height:100%;}
@@ -163,31 +163,6 @@
     50%{opacity:1; transform:translateY(-3px);}
   }
 
-  /* Quick actions */
-  .quick-actions{
-    display:flex;
-    gap:8px;
-    padding:2px 16px 14px;
-    flex-wrap:wrap;
-    flex-shrink:0;
-  }
-  .quick-btn{
-    background:var(--ai-bubble);
-    border:1px solid rgba(11,31,51,0.08);
-    color:var(--dark);
-    padding:8px 13px;
-    border-radius:20px;
-    font-size:0.78rem;
-    font-weight:500;
-    cursor:pointer;
-    transition:0.2s;
-    white-space:nowrap;
-  }
-  .quick-btn:hover{
-    background:var(--primary);
-    color:#fff;
-    border-color:var(--primary);
-  }
 
   /* Input row */
   .chat-input-row{
@@ -239,11 +214,6 @@
       <div class="msg bot">Welcome to Aroura Perfumes ✨ I can help you find your perfect scent, explore our collection, or assist with your order. What brings you here today?</div>
     </div>
 
-    <div class="quick-actions" id="quick-actions">
-      <button class="quick-btn" data-key="scent">✨ Find My Scent</button>
-      <button class="quick-btn" data-key="explore">🌸 Explore Fragrances</button>
-      <button class="quick-btn" data-key="order">🛍️ Order Assistance</button>
-    </div>
 
     <div class="chat-input-row">
       <input type="text" id="chat-input" placeholder="Ask about fragrances, orders, or recommendations..." autocomplete="off">
@@ -336,7 +306,6 @@
   function setInputDisabled(disabled){
     input.disabled = disabled;
     sendBtn.disabled = disabled;
-    document.querySelectorAll('.quick-btn').forEach(b => b.disabled = disabled);
   }
 
   async function sendToN8n(message){
@@ -372,12 +341,6 @@
     setInputDisabled(false);
     input.focus();
   }
-
-  document.querySelectorAll('.quick-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      sendUserMessage(btn.textContent);
-    });
-  });
 
   function handleSend(){
     const val = input.value.trim();
