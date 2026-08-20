@@ -345,7 +345,7 @@
   function setInputDisabled(disabled){
     input.disabled = disabled;
     sendBtn.disabled = disabled;
-    document.querySelectorAll('.quick-btn').forEach(b => b.disabled = disabled);
+    // Quick action buttons stay permanently disabled — never re-enabled here.
   }
 
   async function sendToN8n(message){
