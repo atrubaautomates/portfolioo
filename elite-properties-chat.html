@@ -186,6 +186,16 @@
     color:#fff;
     border-color:var(--primary);
   }
+  .quick-btn[disabled]{
+    cursor:default;
+    pointer-events:none;
+    opacity:0.85;
+  }
+  .quick-btn[disabled]:hover{
+    background:var(--ai-bubble);
+    color:var(--dark);
+    border-color:rgba(11,31,51,0.08);
+  }
 
   /* Input row */
   .chat-input-row{
@@ -239,9 +249,9 @@
     </div>
 
     <div class="quick-actions" id="quick-actions">
-      <button class="quick-btn" data-key="find">🏠 Find Property</button>
-      <button class="quick-btn" data-key="viewing">📅 Book Viewing</button>
-      <button class="quick-btn" data-key="agent">💬 Talk to Agent</button>
+      <button class="quick-btn" data-key="find" disabled>🏠 Find Property</button>
+      <button class="quick-btn" data-key="viewing" disabled>📅 Book Viewing</button>
+      <button class="quick-btn" data-key="agent" disabled>💬 Talk to Agent</button>
     </div>
 
     <div class="chat-input-row">
@@ -372,11 +382,7 @@
     input.focus();
   }
 
-  document.querySelectorAll('.quick-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      sendUserMessage(btn.textContent);
-    });
-  });
+  // Quick action buttons are display-only and do not send messages.
 
   function handleSend(){
     const val = input.value.trim();
