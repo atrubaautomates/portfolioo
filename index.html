@@ -18,7 +18,7 @@
     --accent-light:#173357;
     --ring:#3FA9F5;
     --radius:22px;
-    --pad: 8vw;
+    --pad: clamp(20px, 8vw, 90px);
     --obsidian:#050B14;
     --glass:rgba(15,32,56,0.42);
     --glass-strong:rgba(15,32,56,0.65);
@@ -28,7 +28,7 @@
     --font-hud:'Space Grotesk', 'Poppins', sans-serif;
   }
   *{margin:0;padding:0;box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
+  html{scroll-behavior:smooth; scrollbar-gutter:stable;}
   body{
     background:var(--bg);
     color:var(--text);
@@ -802,14 +802,21 @@
 
   <script>
     function openDemoModal(url) {
+      // Measure the scrollbar width BEFORE hiding it, so we can compensate
+      // and stop the page from jumping/reflowing when the modal opens.
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
       document.getElementById('demo-modal-frame').src = url;
       document.getElementById('demo-modal').classList.add('active');
       document.body.style.overflow = 'hidden';
+      if (scrollbarWidth > 0) {
+        document.body.style.paddingRight = scrollbarWidth + 'px';
+      }
     }
     function closeDemoModal() {
       document.getElementById('demo-modal').classList.remove('active');
       document.getElementById('demo-modal-frame').src = '';
       document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
     }
     document.getElementById('demo-modal').addEventListener('click', function (e) {
       if (e.target === this) closeDemoModal();
